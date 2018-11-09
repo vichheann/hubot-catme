@@ -35,7 +35,7 @@ module.exports = (robot) ->
 
   robot.respond /cat( me)? (with|in)( (\w+))?/i, (msg) ->
     category = msg.match[3] || 'funny'
-    msg.http("https://thecatapi.com/api/images/get?format=xml&category="+category)
+    msg.http("https://thecatapi.com/api/images/get?format=xml&category="+category.trim())
       .get() (err, res, body) ->
         if $(body).find('url').length
           msg.send $(body).find('url').text()
