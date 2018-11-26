@@ -5,39 +5,41 @@
 #   "cheerio": "~0.19.0"
 #
 # Configuration:
-#   None
+#   HUBOT_THE_CAT_API_KEY - Obtained from http://thecatapi.com/api-key-registration.html
 #
 # Commands:
 #   hubot cat me - Receive a cat
 #   hubot cat bomb N - Get N cats
 #   hubot cat categories - List all available categories
 #   hubot cat (with|in) category - Receive a cat in the given category
-$ = require 'cheerio'
+# $ = require 'cheerio'
+api_key = process.env.HUBOT_THE_CAT_API_KEY
+cat_search_url = "https://api.thecatapi.com/v1/images/search"
 
 module.exports = (robot) ->
 
   robot.respond /cat( me)?$/i, (msg) ->
-    msg.http("https://api.thecatapi.com/api/images/get?format=xml")
+    msg.http("#{cat_search_url}").header('x-api-key', "#{api_key}")
       .get() (err, res, body) ->
-        msg.send $(body).find('url').text()
+        msg.send (JSON.parse body)[0]['url']
 
   robot.respond /cat bomb( (\d+))?/i, (msg) ->
     count = msg.match[2] || 5
-    count = 100 if count > 100
-    msg.http("https://api.thecatapi.com/api/images/get?format=xml&results_per_page=" + count)
+    count = 25 if count > 25
+    msg.http("#{cat_search_url}&limit=" + count).header('x-api-key', "#{api_key}")
       .get() (err, res, body) ->
-        msg.send $(cat).find('url').text() for cat in $(body).find('image')
+        msg.send cat['url'] for cat in (JSON.parse body)
 
   robot.respond /cat categories/i, (msg) ->
-    msg.http("https://api.thecatapi.com/api/categories/list")
+    msg.http("https://api.thecatapi.com/v1/categories").header('x-api-key', "#{api_key}")
       .get() (err, res, body) ->
-        msg.send $(category).find('name').text() for category in $(body).find('category')
+        msg.send "#{category['id']}: #{category['name']}" for category in (JSON.parse body)
 
   robot.respond /cat( me)? (with|in)( (\w+))?/i, (msg) ->
-    category = msg.match[3] || 'funny'
-    msg.http("https://api.thecatapi.com/api/images/get?format=xml&category="+category.trim())
+    category = msg.match[3] || '15' #clothes
+    msg.http("#{cat_search_url}&category_ids="+category.trim()).header('x-api-key', "#{api_key}")
       .get() (err, res, body) ->
-        if $(body).find('url').length
-          msg.send $(body).find('url').text()
+        if (JSON.parse body).length
+          msg.send (JSON.parse body)[0]['url']
         else
           msg.send 'Enter a valid category (type "cat categories" for a list of valid categories)'
