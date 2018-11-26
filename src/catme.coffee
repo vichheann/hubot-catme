@@ -2,7 +2,6 @@
 #   cat me is the most important thing in life
 #
 # Dependencies:
-#   "cheerio": "~0.19.0"
 #
 # Configuration:
 #   HUBOT_THE_CAT_API_KEY - Obtained from http://thecatapi.com/api-key-registration.html
@@ -11,8 +10,7 @@
 #   hubot cat me - Receive a cat
 #   hubot cat bomb N - Get N cats
 #   hubot cat categories - List all available categories
-#   hubot cat (with|in) category - Receive a cat in the given category
-# $ = require 'cheerio'
+#   hubot cat (with|in) category - Receive a cat in the given category (use index number for now)
 api_key = process.env.HUBOT_THE_CAT_API_KEY
 cat_search_url = "https://api.thecatapi.com/v1/images/search"
 
@@ -30,6 +28,7 @@ module.exports = (robot) ->
       .get() (err, res, body) ->
         msg.send cat['url'] for cat in (JSON.parse body)
 
+# TODO: put that in the brain
   robot.respond /cat categories/i, (msg) ->
     msg.http("https://api.thecatapi.com/v1/categories").header('x-api-key', "#{api_key}")
       .get() (err, res, body) ->
