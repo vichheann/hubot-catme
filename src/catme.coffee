@@ -15,6 +15,13 @@
 #         Receive a cat in the given category (use index number for now)
 api_key = process.env.HUBOT_THE_CAT_API_KEY
 cat_search_url = "https://api.thecatapi.com/v1/images/search"
+categories = [{"id":5,"name":"boxes"},
+              {"id":15,"name":"clothes"},
+              {"id":1,"name":"hats"},
+              {"id":14,"name":"sinks"},
+              {"id":2,"name":"space"},
+              {"id":4,"name":"sunglasses"},
+              {"id":7,"name":"ties"}]
 
 module.exports = (robot) ->
 
@@ -34,11 +41,15 @@ module.exports = (robot) ->
   robot.respond /cat categories/i, (msg) ->
     authenticated_msg msg, "https://api.thecatapi.com/v1/categories"
       .get() (err, res, body) ->
-        msg.send "#{category['id']}: #{category['name']}" for category in (JSON.parse body)
+        categories = (JSON.parse body).reduce (x, y) ->
+          x[y.name]= y.id
+          x
+        , {}
+        msg.send "#{key}" for own key,value of categories
 
   robot.respond /cat( me)? (with|in)( (\w+))?/i, (msg) ->
-    category = msg.match[3] || '15' #clothes
-    authenticated_msg msg, "#{cat_search_url}?category_ids="+category.trim()
+    category = categories[msg.match[3].trim() || "clothes"]
+    authenticated_msg msg, "#{cat_search_url}?category_ids=#{category}"
       .get() (err, res, body) ->
         response = JSON.parse body
         if response.length
