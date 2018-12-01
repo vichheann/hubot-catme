@@ -26,20 +26,20 @@ categories = [{"id":5,"name":"boxes"},
 module.exports = (robot) ->
 
   robot.respond /cat( me)?$/i, (msg) ->
-    authenticated_msg msg, "#{cat_search_url}"
+    authenticated_msg(msg, "#{cat_search_url}")
       .get() (err, res, body) ->
         msg.send (JSON.parse body)[0]['url']
 
   robot.respond /cat bomb( (\d+))?/i, (msg) ->
     count = msg.match[2] || 5
     count = 25 if count > 25
-    authenticated_msg msg, "#{cat_search_url}?limit=#{count}"
+    authenticated_msg(msg, "#{cat_search_url}?limit=#{count}")
       .get() (err, res, body) ->
         msg.send cat['url'] for cat in (JSON.parse body)
 
 # TODO: put that in the brain
   robot.respond /cat categories/i, (msg) ->
-    authenticated_msg msg, "https://api.thecatapi.com/v1/categories"
+    authenticated_msg(msg, "https://api.thecatapi.com/v1/categories")
       .get() (err, res, body) ->
         categories = (JSON.parse body).reduce (x, y) ->
           x[y.name]= y.id
@@ -49,7 +49,7 @@ module.exports = (robot) ->
 
   robot.respond /cat( me)? (with|in)( (\w+))?/i, (msg) ->
     category = categories[msg.match[3].trim() || "clothes"]
-    authenticated_msg msg, "#{cat_search_url}?category_ids=#{category}"
+    authenticated_msg(msg, "#{cat_search_url}?category_ids=#{category}")
       .get() (err, res, body) ->
         response = JSON.parse body
         if response.length
