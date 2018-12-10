@@ -15,13 +15,13 @@
 #         Receive a cat in the given category (use index number for now)
 api_key = process.env.HUBOT_THE_CAT_API_KEY
 cat_search_url = "https://api.thecatapi.com/v1/images/search"
-categories = [{"id":5,"name":"boxes"},
-              {"id":15,"name":"clothes"},
-              {"id":1,"name":"hats"},
-              {"id":14,"name":"sinks"},
-              {"id":2,"name":"space"},
-              {"id":4,"name":"sunglasses"},
-              {"id":7,"name":"ties"}]
+categories = [{"boxes": 5},
+              {"clothes": 15},
+              {"hats": 1},
+              {"sinks": 14},
+              {"space": 2},
+              {"sunglasses": 4},
+              {"ties": 7}]
 
 module.exports = (robot) ->
 
